@@ -11,8 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/cors": "^2.8.17",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.4",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "tslog": "^4.9.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.3",
