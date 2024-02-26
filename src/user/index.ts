@@ -10,6 +10,7 @@ userRouter.use((req, res, next) => {
 });
 
 userRouter.get("/login", (req, res) => {
+  throw Error("ВЫЗОВ ОШИБКИ! Для проверки работы ErrorHandlerMiddleware");
   res.send("login");
 });
 

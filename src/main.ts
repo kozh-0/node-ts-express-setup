@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { MyLogger } from "./helper/logger";
 import { userRouter } from "./user";
+import { ErrorHandlerMiddleware } from "./helper/errorHandlerMiddleware";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -22,9 +23,8 @@ app.use((req, res, next) => {
 
 app.use("/user", userRouter);
 
-app.get("/", (req, res) => {
-  res.send("HELLO! Express + TypeScript Server");
-});
+// После возникновения ошибки в middleware'ах или роутах код попадет сюда, перед тем как отправится к пользователю
+app.use(ErrorHandlerMiddleware);
 
 app.listen(port, () => {
   MyLogger.log(`[server]: Server is running at http://localhost:${port}`);
