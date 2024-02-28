@@ -16,14 +16,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: ["http://localhost:3333", "*"] }));
 
 // middleware к роутам
-app.use((req, res, next) => {
-  MyLogger.log("APP MIDDLEWARE", req.body);
-  next();
-});
+// app.use((req, res, next) => {
+//   MyLogger.log("APP MIDDLEWARE", req.body);
+//   next();
+// });
 
-app.use("/user", userRouter);
+app.use("", userRouter);
 
 // После возникновения ошибки в middleware'ах или роутах код попадет сюда, перед тем как отправится к пользователю
+// ТОЛЬКО ЕСЛИ КОД СИНХРОННЫЙ ИЛИ КОЛБЕЧНЫЙ, иначе приложение сломается
 app.use(ErrorHandlerMiddleware);
 
 app.listen(port, () => {

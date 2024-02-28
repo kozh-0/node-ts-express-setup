@@ -8,5 +8,17 @@ export const ErrorHandlerMiddleware = (
   next: NextFunction
 ) => {
   MyLogger.error(`Возникла ошибка: ${err}`);
-  res.status(500).send(err.message);
+  res.status(500).send({ err: err.message });
 };
+
+// export const tryCatch = async <T = any>(
+//   controller: (req: Request<{}, {}, T>, res: Response, next?: NextFunction) => Promise<void>
+// ) => {
+//   try {
+//     //@ts-ignore
+//     await controller(req, res);
+//   } catch (error) {
+//     //@ts-ignore
+//     return next(error);
+//   }
+// };
