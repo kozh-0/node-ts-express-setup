@@ -1,35 +1,52 @@
 import fs from "fs";
 
-export const addUser = (password: string, username: string) => {
-  if (!password || !username) throw Error("Password or username is missing");
+// interface IUserController {
+//   getUsers: () => Record<string, string>;
+//   addUser: (password: string, username: string) => Promise<{ user: string; err: string }>;
+//   checkUser: (password: string, username: string) => Promise<{ credentials: boolean; err: string }>;
+// }
 
-  let DB_data: Record<string, string> = {};
+export abstract class UserCntroller /* implements IUserController */ {
+  // users
+  public static async getUsers() {
+    if (!fs.existsSync("DB.json"))
+      return { data: {}, err: "DB does not exist, register someone first" };
 
-  if (fs.existsSync("DB.json")) {
-    DB_data = JSON.parse(fs.readFileSync("DB.json", { encoding: "utf-8" }));
+    const jsonDB: Record<string, string> = JSON.parse(
+      fs.readFileSync("DB.json", { encoding: "utf-8" })
+    );
+
+    return jsonDB;
   }
 
-  DB_data[username] = password;
+  // login
+  public static async addUser(password: string, username: string) {
+    if (!password || !username) return { user: "", err: "Password or username is missing" };
 
-  fs.writeFileSync("DB.json", JSON.stringify(DB_data));
+    let DB_data: Record<string, string> = {};
 
-  return { user: username };
-};
+    if (!fs.existsSync("DB.json")) {
+      DB_data = JSON.parse(fs.readFileSync("DB.json", { encoding: "utf-8" }));
+    }
 
-export const checkUser = (password: string, username: string) => {
-  if (!password || !username) throw Error("Password or username is missing");
-  if (!fs.existsSync("DB.json")) throw Error("DB does not exist, register someone first");
+    DB_data[username] = password;
 
-  let DB_data: Record<string, string> = JSON.parse(
-    fs.readFileSync("DB.json", { encoding: "utf-8" })
-  );
+    await fs.promises.writeFile("DB.json", JSON.stringify(DB_data));
+    return { user: username, err: "" };
+  }
 
-  const isUser = password === DB_data[username];
+  // register
+  public static async checkUser(password: string, username: string) {
+    if (!password || !username)
+      return { credentials: false, err: "Password or username is missing" };
+    if (!fs.existsSync("DB.json"))
+      return { credentials: true, err: "DB does not exist, register someone first" };
 
-  return { credentials: isUser };
-};
+    // может тут поломаться на парсе
+    let DB_data: Record<string, string> = JSON.parse(
+      fs.readFileSync("DB.json", { encoding: "utf-8" })
+    );
 
-export const getUsers = () => {
-  if (!fs.existsSync("DB.json")) throw Error("DB does not exist, register someone first");
-  return fs.readFileSync("DB.json", { encoding: "utf-8" });
-};
+    return { credentials: password === DB_data[username], err: "" };
+  }
+}

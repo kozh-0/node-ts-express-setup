@@ -1,5 +1,6 @@
 /dist
 /node_modules
+/.clinic
 
 .env
 DB.json
