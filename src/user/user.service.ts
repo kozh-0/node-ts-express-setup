@@ -1,12 +1,12 @@
 import fs from "fs";
 
-// interface IUserController {
+// interface UserService {
 //   getUsers: () => Record<string, string>;
 //   addUser: (password: string, username: string) => Promise<{ user: string; err: string }>;
 //   checkUser: (password: string, username: string) => Promise<{ credentials: boolean; err: string }>;
 // }
 
-export abstract class UserCntroller /* implements IUserController */ {
+export abstract class UserService /* implements UserService */ {
   // users
   public static async getUsers() {
     if (!fs.existsSync("DB.json"))
