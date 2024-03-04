@@ -4,6 +4,9 @@ import cors from "cors";
 import { MyLogger } from "./helper/logger";
 import { userRouter } from "./user";
 import { ErrorHandlerMiddleware } from "./helper/errorHandlerMiddleware";
+import { PrismaClient } from "@prisma/client";
+
+export const prisma = new PrismaClient();
 
 const app = express();
 const port = process.env.PORT || 3000;

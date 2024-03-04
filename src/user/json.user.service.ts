@@ -19,8 +19,8 @@ export abstract class UserService /* implements UserService */ {
     return jsonDB;
   }
 
-  // login
-  public static async addUser(password: string, username: string) {
+  // register
+  public static async createUser(password: string, username: string) {
     if (!password || !username) return { user: "", err: "Password or username is missing" };
 
     if (!fs.existsSync("DB.json")) {
@@ -40,7 +40,7 @@ export abstract class UserService /* implements UserService */ {
     return { user: username, err: "" };
   }
 
-  // register
+  // login
   public static async checkUser(password: string, username: string) {
     if (!password || !username)
       return { credentials: false, err: "Password or username is missing" };
