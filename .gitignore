@@ -1,6 +1,7 @@
 /dist
 /node_modules
 /.clinic
+/.vscode
 
 .env
 DB.json

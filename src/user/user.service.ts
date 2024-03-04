@@ -23,13 +23,18 @@ export abstract class UserService /* implements UserService */ {
   public static async addUser(password: string, username: string) {
     if (!password || !username) return { user: "", err: "Password or username is missing" };
 
-    let DB_data: Record<string, string> = {};
-
     if (!fs.existsSync("DB.json")) {
-      DB_data = JSON.parse(fs.readFileSync("DB.json", { encoding: "utf-8" }));
+      await fs.promises.writeFile("DB.json", JSON.stringify({ [username]: password }));
+      return { user: username, err: "" };
     }
 
+    let DB_data: Record<string, string> = await fs.promises
+      .readFile("DB.json")
+      .then((res) => JSON.parse(res.toString()));
+    // .catch(() => ({ user: "", err: "Corrupted data" }));
+
     DB_data[username] = password;
+    console.log(DB_data);
 
     await fs.promises.writeFile("DB.json", JSON.stringify(DB_data));
     return { user: username, err: "" };
