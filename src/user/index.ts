@@ -11,6 +11,12 @@ export const userRouter = express.Router();
 //   next();
 // });
 
+userRouter.post("/jwt", async (_, res) => {
+  const token = await PrismaUserService.issueJWT();
+  res.status(200).json(token);
+
+  // users.err ? res.status(500).json(users) : res.status(200).json(users);
+});
 userRouter.post("/users", async (_, res) => {
   const users = await PrismaUserService.getUsers();
   res.status(200).json(users);
