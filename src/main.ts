@@ -5,6 +5,7 @@ import { MyLogger } from "./helper/logger";
 import { userRouter } from "./user";
 import { ErrorHandlerMiddleware } from "./helper/errorHandlerMiddleware";
 import { PrismaClient } from "@prisma/client";
+import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
 
 export const prisma = new PrismaClient();
 
@@ -31,5 +32,9 @@ app.use("", userRouter);
 app.use(ErrorHandlerMiddleware);
 
 app.listen(port, () => {
-  MyLogger.log(`[server]: Server is running at http://localhost:${port}`);
+  MyLogger.log(`[API]: Server is running at http://localhost:${port}`);
+  prisma
+    .$connect()
+    .then(() => MyLogger.log(`[DB]: BD is running`))
+    .catch((err: PrismaClientInitializationError) => MyLogger.error(`[DB]: ${err.message}`));
 });
