@@ -1,8 +1,10 @@
 import express, { Request } from "express";
-import { UserService } from "./json.user.service";
 import { PrismaUserService } from "./db.user.service";
+import { AuthMiddleware } from "../helper/authMiddleware";
 
 export const userRouter = express.Router();
+
+userRouter.use(AuthMiddleware);
 
 // middleware именно для роутера /user
 // ТУТ ВАЛИДИРОВАТЬ ДАННЫЕ МОЖНО
@@ -11,12 +13,6 @@ export const userRouter = express.Router();
 //   next();
 // });
 
-userRouter.post("/jwt", async (_, res) => {
-  const token = await PrismaUserService.issueJWT();
-  res.status(200).json(token);
-
-  // users.err ? res.status(500).json(users) : res.status(200).json(users);
-});
 userRouter.post("/users", async (_, res) => {
   const users = await PrismaUserService.getUsers();
   res.status(200).json(users);
@@ -24,22 +20,16 @@ userRouter.post("/users", async (_, res) => {
   // users.err ? res.status(500).json(users) : res.status(200).json(users);
 });
 
-userRouter.post(
-  "/login",
-  async (req: Request<{}, {}, { password: string; username: string }>, res) => {
-    const { password, username } = req.body;
-    const user = await PrismaUserService.checkUser(password, username);
+userRouter.post("/login", async (req: Request, res) => {
+  const { username, email, password } = req.body;
+  const user = await PrismaUserService.checkUser(username, email, password);
 
-    user.err ? res.status(404).json(user) : res.status(200).json(user);
-  }
-);
+  user.err ? res.status(404).json(user) : res.status(200).json(user);
+});
 
-userRouter.post(
-  "/register",
-  async (req: Request<{}, {}, { password: string; username: string }>, res) => {
-    const { password, username } = req.body;
-    const user = await PrismaUserService.createUser(password, username);
+userRouter.post("/register", async (req: Request, res) => {
+  const { username, email, password } = req.body;
+  const user = await PrismaUserService.createUser(username, email, password);
 
-    user.err ? res.status(400).send(user) : res.status(201).json(user);
-  }
-);
+  user.err ? res.status(400).send(user) : res.status(201).json(user);
+});
