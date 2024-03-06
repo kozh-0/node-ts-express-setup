@@ -9,7 +9,7 @@ export const AuthMiddleware = (req: Request, res: Response, next: NextFunction) 
     const jwt =
       req.headers.authorization.split(" ")[req.headers.authorization.split(" ").length - 1];
 
-    verify(jwt, process.env.JWT_SECRET as string);
+    verify(jwt, process.env.ACCESS_TOKEN_SECRET as string);
     return next();
   }
 

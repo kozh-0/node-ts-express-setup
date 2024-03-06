@@ -32,7 +32,8 @@ app.use("", userRouter);
 app.use(ErrorHandlerMiddleware);
 
 app.listen(port, () => {
-  if (!process.env.JWT_SECRET) throw Error("Не выставлен JWT секрет!");
+  if (!process.env.ACCESS_TOKEN_SECRET && !process.env.REFRESH_TOKEN_SECRET)
+    throw Error("Не выставлен JWT секрет!");
   MyLogger.log(`[API]: Server is running at http://localhost:${port}`);
   prisma
     .$connect()

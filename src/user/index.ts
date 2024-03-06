@@ -6,13 +6,6 @@ export const userRouter = express.Router();
 
 userRouter.use(AuthMiddleware);
 
-// middleware именно для роутера /user
-// ТУТ ВАЛИДИРОВАТЬ ДАННЫЕ МОЖНО
-// userRouter.use((req, res, next) => {
-//   MyLogger.warn("On User route");
-//   next();
-// });
-
 userRouter.post("/users", async (_, res) => {
   const users = await PrismaUserService.getUsers();
   res.status(200).json(users);
