@@ -17,6 +17,7 @@ userRouter.post("/login", async (req: Request, res) => {
   const { username, email, password } = req.body;
   const user = await PrismaUserService.checkUser(username, email, password);
 
+  // @ts-ignore
   user.err ? res.status(404).json(user) : res.status(200).json(user);
 });
 
@@ -24,5 +25,6 @@ userRouter.post("/register", async (req: Request, res) => {
   const { username, email, password } = req.body;
   const user = await PrismaUserService.createUser(username, email, password);
 
+  // @ts-ignore
   user.err ? res.status(400).send(user) : res.status(201).json(user);
 });

@@ -2,13 +2,16 @@ import { prisma } from "../main";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-// Время для Access и Refresh токена
-const issueJWT = async (payload: any, expiresIn: "20m" | "1d"): Promise<string> => {
+// Refresh токен хранить в редисе
+const issueJWTs = (payload: any) => {
   // тут будет JWT секрет, иначе без него не запустится сервер
-  return jwt.sign({ payload }, process.env.ACCESS_TOKEN_SECRET!, {
+  const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!);
+  const accessToken = jwt.sign({ payload }, process.env.ACCESS_TOKEN_SECRET!, {
     algorithm: "HS256",
-    expiresIn,
+    expiresIn: "20m",
   });
+
+  return { accessToken, refreshToken };
 };
 
 // Разбить на отдельные файлы, чтобы можно было их легко заменить по лейер архитектуре
@@ -26,9 +29,8 @@ export abstract class PrismaUserService {
     // Добавить валидацию емейла и пароля
     email: string,
     password: string
-  ): Promise<{ accessToken: null | string; err: string }> {
-    if (!password || !username || !email)
-      return { accessToken: null, err: "Some credentials are missing" };
+  ): Promise<{ err: string } | { accessToken: string; refreshToken: string }> {
+    if (!password || !username || !email) return { err: "Some credentials are missing" };
 
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -37,14 +39,14 @@ export abstract class PrismaUserService {
         .create({
           data: { username, email, password: hashedPassword, role: "user" },
         })
-        .then(async (user) => {
+        .then((user) => {
           const { password, ...userWithoutPassword } = user;
-          return { accessToken: await issueJWT(userWithoutPassword, "20m"), err: "" };
+          return issueJWTs(userWithoutPassword);
         });
     } catch (error: any) {
       console.log(JSON.stringify(error));
 
-      return { accessToken: null, err: error.name || "Such user already exists" };
+      return { err: error.name || "Such user already exists" };
     }
   }
 
@@ -53,9 +55,8 @@ export abstract class PrismaUserService {
     username: string,
     email: string,
     password: string
-  ): Promise<{ accessToken: null | string; err: string }> {
-    if (!password && (!username || !email))
-      return { accessToken: null, err: "Some credentials are missing" };
+  ): Promise<{ err: string } | { accessToken: string; refreshToken: string }> {
+    if (!password && (!username || !email)) return { err: "Some credentials are missing" };
 
     // Вход по юзернейму либо паролю
     const user = await prisma.user.findFirst({
@@ -66,10 +67,9 @@ export abstract class PrismaUserService {
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const { password, ...userWithoutPassword } = user;
-      const accessToken = await issueJWT(userWithoutPassword, "20m");
-      return { accessToken, err: "" };
+      return issueJWTs(userWithoutPassword);
     }
 
-    return { accessToken: null, err: "No such user" };
+    return { err: "No such user" };
   }
 }
