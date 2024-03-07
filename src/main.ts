@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { userRouter } from './user';
 import { ErrorHandlerMiddleware } from './helper/errorHandler';
 import { PrismaClient } from '@prisma/client';
@@ -15,7 +16,8 @@ const app = express();
 app.use(express.json());
 // Чтобы распозновать переданные данные как строку или массив
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: ['http://localhost:3333', '*'] }));
+app.use(cookieParser());
+app.use(cors({ origin: ['http://localhost:3333', '*'], credentials: true }));
 
 app.use('', userRouter);
 

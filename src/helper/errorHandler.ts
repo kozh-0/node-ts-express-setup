@@ -17,7 +17,7 @@ export const ErrorHandlerMiddleware = (err: Error | MyError, req: Request, res: 
     MyLogger.error(`[${err.context}] Ошибка ${err.statusCode}: ${err.message}`);
     res.status(err.statusCode).send({ err: err.message });
   } else {
-    MyLogger.error(err.message);
+    MyLogger.error(`Системная ошибка: ${err.message}`);
     res.status(500).send({ err: err.message });
   }
 };

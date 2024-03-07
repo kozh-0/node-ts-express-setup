@@ -11,3 +11,4 @@ userRouter.use(AuthMiddleware);
 userRouter.post('/getUsers', tryCatchWrapper(UserController.getUsers));
 userRouter.post('/register', tryCatchWrapper(UserController.register));
 userRouter.post('/login', tryCatchWrapper(UserController.login));
+userRouter.post('/token', tryCatchWrapper(UserController.newToken));
