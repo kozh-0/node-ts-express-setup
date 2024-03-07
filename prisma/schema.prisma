@@ -13,13 +13,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+enum Role {
+  ADMIN
+  USER
+}
+// Можно хранить последние IP пользователя 
 model User {
-  id          Int        @id @default(autoincrement())
-  username    String     @unique
-  email       String     @unique
-  password    String
-  role        String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id            Int        @id @default(autoincrement())
+  username      String     @unique
+  email         String     @unique
+  password      String
+  role          Role       @default(USER)     
+  isActivated   Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }

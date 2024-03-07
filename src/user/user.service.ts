@@ -1,14 +1,15 @@
-import { prisma } from "../main";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import { prisma } from '../main';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { MyError } from '../helper/errorHandler';
 
-// Refresh токен хранить в редисе
+// Refresh токен хранить в редисе, он бесконечный, не истекает, удаеляем вручную при логауте
 const issueJWTs = (payload: any) => {
   // тут будет JWT секрет, иначе без него не запустится сервер
   const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!);
   const accessToken = jwt.sign({ payload }, process.env.ACCESS_TOKEN_SECRET!, {
-    algorithm: "HS256",
-    expiresIn: "20m",
+    algorithm: 'HS256',
+    expiresIn: '20m',
   });
 
   return { accessToken, refreshToken };
@@ -18,7 +19,7 @@ const issueJWTs = (payload: any) => {
 
 // Надо сделать нормальный throw Error, чтобы правильно распределять ошибки
 export abstract class PrismaUserService {
-  // users
+  // getUsers
   public static async getUsers() {
     return await prisma.user.findMany();
   }
@@ -28,35 +29,27 @@ export abstract class PrismaUserService {
     username: string,
     // Добавить валидацию емейла и пароля
     email: string,
-    password: string
-  ): Promise<{ err: string } | { accessToken: string; refreshToken: string }> {
-    if (!password || !username || !email) return { err: "Some credentials are missing" };
+    password: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    if (!password || !username || !email) throw new MyError('Some credentials are missing', 400);
 
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      return await prisma.user
-        .create({
-          data: { username, email, password: hashedPassword, role: "user" },
-        })
-        .then((user) => {
-          const { password, ...userWithoutPassword } = user;
-          return issueJWTs(userWithoutPassword);
-        });
-    } catch (error: any) {
-      console.log(JSON.stringify(error));
+    const user = await prisma.user.create({
+      data: { username, email, password: hashedPassword },
+    });
 
-      return { err: error.name || "Such user already exists" };
-    }
+    const { password: _, ...userWithoutPassword } = user;
+    return issueJWTs(userWithoutPassword);
   }
 
   // login
   public static async checkUser(
     username: string,
     email: string,
-    password: string
-  ): Promise<{ err: string } | { accessToken: string; refreshToken: string }> {
-    if (!password && (!username || !email)) return { err: "Some credentials are missing" };
+    password: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    if (!password && (!username || !email)) throw new MyError('Some credentials are missing', 400);
 
     // Вход по юзернейму либо паролю
     const user = await prisma.user.findFirst({
@@ -69,7 +62,6 @@ export abstract class PrismaUserService {
       const { password, ...userWithoutPassword } = user;
       return issueJWTs(userWithoutPassword);
     }
-
-    return { err: "No such user" };
+    throw new MyError('No such user', 400);
   }
 }

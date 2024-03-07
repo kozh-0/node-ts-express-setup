@@ -1,30 +1,13 @@
-import express, { Request } from "express";
-import { PrismaUserService } from "./db.user.service";
-import { AuthMiddleware } from "../helper/authMiddleware";
+import { Router } from 'express';
+import { AuthMiddleware } from '../helper/authMiddleware';
+import { UserController } from './user.controller';
+import { tryCatchWrapper } from '../helper/errorHandler';
 
-export const userRouter = express.Router();
+export const userRouter = Router();
 
-userRouter.use(AuthMiddleware);
+// userRouter.use(AuthMiddleware);
 
-userRouter.post("/users", async (_, res) => {
-  const users = await PrismaUserService.getUsers();
-  res.status(200).json(users);
-
-  // users.err ? res.status(500).json(users) : res.status(200).json(users);
-});
-
-userRouter.post("/login", async (req: Request, res) => {
-  const { username, email, password } = req.body;
-  const user = await PrismaUserService.checkUser(username, email, password);
-
-  // @ts-ignore
-  user.err ? res.status(404).json(user) : res.status(200).json(user);
-});
-
-userRouter.post("/register", async (req: Request, res) => {
-  const { username, email, password } = req.body;
-  const user = await PrismaUserService.createUser(username, email, password);
-
-  // @ts-ignore
-  user.err ? res.status(400).send(user) : res.status(201).json(user);
-});
+// TryCatch обертку сделать, чтобы throw Error делать
+userRouter.post('/getUsers', tryCatchWrapper(UserController.getUsers));
+userRouter.post('/register', tryCatchWrapper(UserController.register));
+userRouter.post('/login', tryCatchWrapper(UserController.login));

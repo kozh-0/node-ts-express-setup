@@ -1,10 +1,10 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import { userRouter } from "./user";
-import { ErrorHandlerMiddleware } from "./helper/errorHandlerMiddleware";
-import { PrismaClient } from "@prisma/client";
-import { ON_INIT } from "./helper/onInit";
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { userRouter } from './user';
+import { ErrorHandlerMiddleware } from './helper/errorHandler';
+import { PrismaClient } from '@prisma/client';
+import { ON_INIT } from './helper/onInit';
 
 export const prisma = new PrismaClient();
 
@@ -15,9 +15,9 @@ const app = express();
 app.use(express.json());
 // Чтобы распозновать переданные данные как строку или массив
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: ["http://localhost:3333", "*"] }));
+app.use(cors({ origin: ['http://localhost:3333', '*'] }));
 
-app.use("", userRouter);
+app.use('', userRouter);
 
 // После возникновения ошибки в middleware'ах или роутах код попадет сюда, перед тем как отправится к пользователю
 // ТОЛЬКО ЕСЛИ КОД СИНХРОННЫЙ ИЛИ КОЛБЕЧНЫЙ, иначе приложение сломается
