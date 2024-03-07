@@ -15,11 +15,8 @@ const issueJWTs = (payload: any) => {
   return { accessToken, refreshToken };
 };
 
-// Разбить на отдельные файлы, чтобы можно было их легко заменить по лейер архитектуре
-
-// Надо сделать нормальный throw Error, чтобы правильно распределять ошибки
-export abstract class PrismaUserService {
-  // getUsers
+export abstract class UserService {
+  // getUsers (возвращает хэш паролей)
   public static async getUsers() {
     return await prisma.user.findMany();
   }
@@ -59,7 +56,7 @@ export abstract class PrismaUserService {
     });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...userWithoutPassword } = user;
+      const { password: _, ...userWithoutPassword } = user;
       return issueJWTs(userWithoutPassword);
     }
     throw new MyError('No such user', 400);

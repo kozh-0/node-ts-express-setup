@@ -5,7 +5,7 @@ import { tryCatchWrapper } from '../helper/errorHandler';
 
 export const userRouter = Router();
 
-// userRouter.use(AuthMiddleware);
+userRouter.use(AuthMiddleware);
 
 // TryCatch обертку сделать, чтобы throw Error делать
 userRouter.post('/getUsers', tryCatchWrapper(UserController.getUsers));
