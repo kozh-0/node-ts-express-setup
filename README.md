@@ -13,9 +13,9 @@
 
 Создаем .env файл и вводим
 
-> DATABASE_URL="postgresql://postgres:test@localhost:6666/postgres?schema=public"
-> PORT=3000
-> ACCESS_TOKEN_SECRET={любой секрет}
-> REFRESH_TOKEN_SECRET={другой любой секрет}
+> DATABASE_URL="postgresql://postgres:test@localhost:6666/postgres?schema=public"  
+> PORT=3000  
+> ACCESS_TOKEN_SECRET={любой секрет}  
+> REFRESH_TOKEN_SECRET={другой любой секрет}  
 
 ### Запуск проекта - `npm run dev`
